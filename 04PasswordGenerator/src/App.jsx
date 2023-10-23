@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 function App() {
   const [length, setLength] = useState(8);
@@ -7,6 +7,10 @@ function App() {
   const [charAllow, setCharAllow] = useState(false);
   const [password, setPassword] = useState("");
 
+  //useRef hook
+  const passwordRef = useRef(null);
+
+  // methods
   const passwordGenerator = useCallback(() => {
     let pass = '';
     let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -23,7 +27,15 @@ function App() {
     }
     setPassword(pass)
 
-  }, [length, numAllow, charAllow, setPassword])
+  }, [length, numAllow, charAllow, setPassword]);
+
+  // method to copy password
+  const copyPassToClipBoard = useCallback(() => {
+    passwordRef.current?.select();
+    passwordRef.current?.setSelectionRange(0, 5);
+    window.navigator.clipboard.writeText(password);
+    alert('Password Copied!');
+  }, [password]);
 
   useEffect(() => { passwordGenerator() }, [length, numAllow, charAllow, passwordGenerator])
 
@@ -38,8 +50,14 @@ function App() {
             className='outline-none w-full py-3 px-3 rounded'
             placeholder='Password'
             readOnly
+            ref={passwordRef}
           />
-          <button className='outline-none bg-blue-600 text-white px-3 py-0.5 shrink-0'>Copy</button>
+          <button
+            onClick={copyPassToClipBoard}
+            className='outline-none bg-blue-600 text-white px-3 py-0.5 shrink-0'
+          >
+            Copy
+          </button>
         </div>
         <div className='flex text-sm gap-x-2'>
           <div className='flex items-center gap-x-1'>
